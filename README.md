@@ -176,11 +176,11 @@ Arquillian will handle packaging the archive, deploying it to the configured con
 
 In the test case a feature of Arquillian is being used that injects a reference to the URL of the deployed application that the test case can use to access the web application content within the archive.  This is really helpful since the archive is dynamically constructed with a generated module name and theregore has a potentially different context-root on each execution.  The ``@ArquillianResource`` annotation directs Arquillian to inject the URL for the deployed application for the unit tests to access and test web applications.
 
-Alternatively, you can specifically name the deployment unit using `@Deployment(name="wlarq")` or you could create a container specific deployment descriptor in which the context-root is specifed, such as weblogic.xml, and include that in the deployment archive that is created.
+Alternatively, you can can create a container specific deployment descriptor in which the context-root is specifed, such as weblogic.xml, and include that in the deployment archive that is created.
 
     <weblogic-web-app>
       <context-root>/wlsarq</context-root>
-    </weblogic-web-app>
+    </weblogic-web-app>    
 
 ## Executing the Unit Test
 
