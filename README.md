@@ -182,6 +182,48 @@ Alternatively, you can can create a container specific deployment descriptor in 
       <context-root>/wlsarq</context-root>
     </weblogic-web-app>    
 
+A second unit test is used to execute a test of a simple @Stateless EJB component using Arquillian.  This unit test creates a JavaArchive for deployment; uses @Inject to inject an instance of the EJB and then verifies it's behavior.
+
+    package buttso.demo.weblogic.wlsarq;
+
+    import com.bea.core.repackaged.springframework.util.Assert;
+    import javax.inject.Inject;
+    import org.jboss.arquillian.container.test.api.Deployment;
+    import org.jboss.arquillian.junit.Arquillian;
+    import org.jboss.shrinkwrap.api.ShrinkWrap;
+    import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+    import org.jboss.shrinkwrap.api.spec.JavaArchive;
+    import org.junit.Test;
+    import org.junit.runner.RunWith;
+
+    /**
+     *
+     * Simple test case to verify behavior of EJB component
+     * Uses @Inject to inject bean to test
+     * 
+     */
+    @RunWith(Arquillian.class)
+    public class PingPongBeanTest {
+
+      @Inject
+      PingPongBean ppb;
+       
+      @Deployment
+      public static JavaArchive createDeployment() {
+        JavaArchive jar = ShrinkWrap.create(JavaArchive.class)
+                .addClass(PingPongBean.class)
+                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return jar;
+      }
+
+      @Test
+      public void test_ping_pong_bean() {
+        Assert.notNull(ppb, "PingPongBean was not injected, is null");
+        Assert.isTrue("pong".equals(ppb.ping()), "The ping didn't pong");
+      }
+    }
+
+
 ## Executing the Unit Test
 
 The unit tests are executed from the maven test goal and the results reported upon completion.
@@ -221,7 +263,7 @@ The unit tests are executed from the maven test goal and the results reported up
     INFO: Testing deployment @ http://192.168.0.13:7001/f6a033f4-07a9-462b-8e0b-2946dd19d577/
     Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.201 sec - in buttso.demo.weblogic.wlsarq.IndexPageTest
     Running buttso.demo.weblogic.wlsarq.PingPongBeanTest
-    Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.975 sec - in     buttso.demo.weblogic.wlsarq.PingPongBeanTest
+    Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.975 sec - in buttso.demo.weblogic.wlsarq.PingPongBeanTest
 
     Results :    
 
