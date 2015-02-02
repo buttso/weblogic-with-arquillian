@@ -4,45 +4,52 @@
 
 *Date: Feb 2015*
 
-This project contains a simple Maven project that demonstrates using Arquillian with the WebLogic Container Adapters to deploy and run unit tests.
+This project contains a simple Maven project that demonstrates using Arquillian with the WebLogic Container Adapters to deploy and run unit tests. It shows the bare-bones of what needs to be added and what a test case looks like.
 
 http://arquillian.org/blog/tags/wls/
 
-**As of January 2015** the plugin and artefacts can also be retrieved from the     Oracle Maven Repository - see [http://maven.oracle.com](http://maven/.oracle.com)
+**As of January 2015** the WebLogic Server artefacts and plugin can be retrieved from the     Oracle Maven Repository - see [http://maven.oracle.com](http://maven/.oracle.com)
+
+
 
 ## Configuring Arquillian in the POM
 
-    <dependencyManagement>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.arquillian</groupId>
-          <artifactId>arquillian-bom</artifactId>
-          <version>1.1.5.Final</version>
-          <scope>import</scope>
-          <type>pom</type>
-      </dependency>
-      </dependencies>
-    </dependencyManagement>
+    <project>
+      ...
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.arquillian</groupId>
+            <artifactId>arquillian-bom</artifactId>
+            <version>1.1.5.Final</version>
+            <scope>import</scope>
+            <type>pom</type>
+        </dependency>
+        </dependencies>
+      </dependencyManagement>
     
-    <dependencies>
-      ....
-      <!-- ###################################### -->
-      <!-- #### Arquillian Test  Dependencies ### -->
-      <!-- ###################################### -->
-      <dependency>
-        <groupId>org.jboss.arquillian.junit</groupId>
-        <artifactId>arquillian-junit-container</artifactId>
-        <scope>test</scope>
-      </dependency>        
-      <dependency>
-        <groupId>org.jboss.arquillian.container</groupId>
-        <artifactId>arquillian-wls-remote-12.1.2</artifactId>
-        <version>1.0.0.Alpha3</version>
-        <scope>test</scope>
-      </dependency>      
-    </dependencies>
+      <dependencies>
+      ...
+        <!-- ###################################### -->
+        <!-- #### Arquillian Test  Dependencies ### -->
+        <!-- ###################################### -->
+        <dependency>
+          <groupId>org.jboss.arquillian.junit</groupId>
+          <artifactId>arquillian-junit-container</artifactId>
+          <scope>test</scope>
+        </dependency>        
+        <dependency>
+          <groupId>org.jboss.arquillian.container</groupId>
+          <artifactId>arquillian-wls-remote-12.1.2</artifactId>
+          <version>1.0.0.Alpha3</version>
+          <scope>test</scope>
+        </dependency>      
+      </dependencies>
+      
+      ...
+    </project>
 
-The container to use for testing is specified as one of the dependencies.  In this case with the arquillian-wls-remote-12.1.2 adapter is used to perform remote operations with WebLogic Server.
+The container to use for testing is specified through the dependencies that are included.  In this case the arquillian-wls-remote-12.1.2 adapter is used to deployment and testing of a remote WebLogic Server instance.
 
     <dependency>
       <groupId>org.jboss.arquillian.container</groupId>
@@ -51,7 +58,12 @@ The container to use for testing is specified as one of the dependencies.  In th
       <scope>test</scope>
     </dependency>      
     
-Another test resource file **arquillian.xml** is used to define settings for the container adapters to use.  The target WebLogic Server instance is defined below.  For the arquillian-wls-remote-12.1.2 adapter, being a remote adapter that is managed independently of the test execution, the server must be running before the testing takes place.
+To define where the server is running and how to connect to it, another test resource file **arquillian.xml** is used to define settings for the container adapters to use.  The details of the target WebLogic Server instance are shown below.  
+
+For the **arquillian-wls-remote-12.1.2 adapter**, being a remote adapter that is managed independently of the test executions, the server must be running before the testing takes place. The remote server can be also local to the environment where the tests are being run.
+
+The **arquillian-wls-managed-12.1.2 adapter** can also be used to control the lifecyle of a local WebLogic Server instance, starting it as part of the test executiona nd stopping it when the tests are complete.
+
 
     <?xml version="1.0"?>
     <arquillian
@@ -80,17 +92,13 @@ Another test resource file **arquillian.xml** is used to define settings for the
   
 ## Creating a Unit Test
 
-In the Arquillian world a test case can perform a deployment that is constructed programatically using the **ShrinkWrap** API.  
-
-The constructed archive is deployed and the `@Test` methods executed.
+In the Arquillian world a unit test can programatically construct a deployment archive using the **ShrinkWrap** API, which is then deployed and used to execute the test
 
 For testing web/html applications a client library such as **HtmlUnit** can be used to open pages, parse and present information, interact with forms and click buttons.
 
-This simple unit test verifies that the static index.html page has been deployed, that it matches the known page line count and the page title is correct.
+This project has a very simple unit test that verifies the static index.html page has been deployed, that it matches the known page line count and the page title is correct.
 
 Arquillian will handle packaging the archive, deploying it to the configured container, invoking the test methods and returning the results.
-
-Arquillian can also inject a reference to the URL of the deployed application, which since it is dynamically constructed, has a potentially different context-root on each execution.  The ``@ArquillianResource`` annotation directs Arquillian to inject URL for unit tests to use to access and test web applications.
 
     package buttso.demo.weblogic.wlsarq;
 
@@ -165,9 +173,18 @@ Arquillian can also inject a reference to the URL of the deployed application, w
       }
     }
 
+
+In the test case a feature of Arquillian is being used that injects a reference to the URL of the deployed application that the test case can use to access the web application content within the archive.  This is really helpful since the archive is dynamically constructed with a generated module name and theregore has a potentially different context-root on each execution.  The ``@ArquillianResource`` annotation directs Arquillian to inject the URL for the deployed application for the unit tests to access and test web applications.
+
+Alternatively, you can specifically name the deployment unit using `@Deployment(name="wlarq")` or you could create a container specific deployment descriptor in which the context-root is specifed, such as weblogic.xml, and include that in the deployment archive that is created.
+
+    <weblogic-web-app>
+      <context-root>/wlsarq</context-root>
+    </weblogic-web-app>
+
 ## Executing the Unit Test
 
-The unit tests are executed from the maven test phase and the results reported upon completion.
+The unit tests are executed from the maven test goal and the results reported upon completion.
 
     [sbutton] wlsarq $ mvn test
     [INFO] Scanning for projects...
