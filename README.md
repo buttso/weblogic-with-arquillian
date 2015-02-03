@@ -14,50 +14,54 @@ http://arquillian.org/blog/tags/wls/
 
 ## Configuring Arquillian in the POM
 
-    <project>
-      ...
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-        </dependency>
-        </dependencies>
-      </dependencyManagement>
-    
-      <dependencies>
-      ...
-        <!-- ###################################### -->
-        <!-- #### Arquillian Test  Dependencies ### -->
-        <!-- ###################################### -->
-        <dependency>
-          <groupId>org.jboss.arquillian.junit</groupId>
-          <artifactId>arquillian-junit-container</artifactId>
-          <scope>test</scope>
-        </dependency>        
-        <dependency>
-          <groupId>org.jboss.arquillian.container</groupId>
-          <artifactId>arquillian-wls-remote-12.1.2</artifactId>
-          <version>1.0.0.Alpha3</version>
-          <scope>test</scope>
-        </dependency>      
-      </dependencies>
-      
-      ...
-    </project>
+```xml
+<project>
+  ...
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>1.1.5.Final</version>
+        <scope>import</scope>
+        <type>pom</type>
+    </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-The container to use for testing is specified through the dependencies that are included.  In this case the arquillian-wls-remote-12.1.2 adapter is used to deployment and testing of a remote WebLogic Server instance.
-
+  <dependencies>
+  ...
+    <!-- ###################################### -->
+    <!-- #### Arquillian Test  Dependencies ### -->
+    <!-- ###################################### -->
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>        
     <dependency>
       <groupId>org.jboss.arquillian.container</groupId>
       <artifactId>arquillian-wls-remote-12.1.2</artifactId>
       <version>1.0.0.Alpha3</version>
       <scope>test</scope>
     </dependency>      
-    
+  </dependencies>
+  
+  ...
+</project>
+```
+
+The container to use for testing is specified through the dependencies that are included.  In this case the arquillian-wls-remote-12.1.2 adapter is used to deployment and testing of a remote WebLogic Server instance.
+
+```xml
+<dependency>
+  <groupId>org.jboss.arquillian.container</groupId>
+  <artifactId>arquillian-wls-remote-12.1.2</artifactId>
+  <version>1.0.0.Alpha3</version>
+  <scope>test</scope>
+</dependency>      
+```
+
 To define where the server is running and how to connect to it, another test resource file **arquillian.xml** is used to define settings for the container adapters to use.  The details of the target WebLogic Server instance are shown below.  
 
 For the **arquillian-wls-remote-12.1.2 adapter**, being a remote adapter that is managed independently of the test executions, the server must be running before the testing takes place. The remote server can be also local to the environment where the tests are being run.
@@ -65,30 +69,31 @@ For the **arquillian-wls-remote-12.1.2 adapter**, being a remote adapter that is
 The **arquillian-wls-managed-12.1.2 adapter** can also be used to control the lifecyle of a local WebLogic Server instance, starting it as part of the test executiona nd stopping it when the tests are complete.
 
 
-    <?xml version="1.0"?>
-    <arquillian
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns="http://jboss.org/schema/arquillian"
-      xsi:schemaLocation="http://jboss.org/schema/arquillian
-                http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
-      <!--
-      <engine>
-        <property name="deploymentExportPath">target/</property>
-      </engine>
-      -->
-    
-      <container qualifier="weblogic" default="true">
-        <defaultProtocol type="Servlet 3.0" />    
-        <configuration>
-          <property name="wlHome">/Users/sbutton/Oracle/Middleware/wlserver</property>
-          <property name="adminUrl">t3://localhost:7001</property>
-          <property name="adminUserName">weblogic</property>
-          <property name="adminPassword">welcome1</property>
-          <property name="target">AdminServer</property>
-        </configuration>
-      </container>
-    </arquillian>
+```xml
+<?xml version="1.0"?>
+<arquillian
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://jboss.org/schema/arquillian"
+  xsi:schemaLocation="http://jboss.org/schema/arquillian
+            http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+  <!--
+  <engine>
+    <property name="deploymentExportPath">target/</property>
+  </engine>
+  -->
 
+  <container qualifier="weblogic" default="true">
+    <defaultProtocol type="Servlet 3.0" />    
+    <configuration>
+      <property name="wlHome">/Users/sbutton/Oracle/Middleware/wlserver</property>
+      <property name="adminUrl">t3://localhost:7001</property>
+      <property name="adminUserName">weblogic</property>
+      <property name="adminPassword">welcome1</property>
+      <property name="target">AdminServer</property>
+    </configuration>
+  </container>
+</arquillian>
+```
   
 ## Creating a Unit Test
 
@@ -100,129 +105,133 @@ This project has a very simple unit test that verifies the static index.html pag
 
 Arquillian will handle packaging the archive, deploying it to the configured container, invoking the test methods and returning the results.
 
-    package buttso.demo.weblogic.wlsarq;
+```java
+package buttso.demo.weblogic.wlsarq;
 
-    import com.gargoylesoftware.htmlunit.WebClient;
-    import com.gargoylesoftware.htmlunit.html.HtmlPage;
-    import java.net.URL;
-    import java.util.logging.Logger;
-    import org.jboss.arquillian.container.test.api.Deployment;
-    import org.jboss.arquillian.container.test.api.RunAsClient;
-    import org.jboss.arquillian.junit.Arquillian;
-    import org.jboss.arquillian.test.api.ArquillianResource;
-    import org.jboss.shrinkwrap.api.ShrinkWrap;
-    import org.jboss.shrinkwrap.api.spec.WebArchive;
-    import org.junit.Assert;
-    import org.junit.Test;
-    import org.junit.runner.RunWith;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import java.net.URL;
+import java.util.logging.Logger;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-    /**
-     * Test case to perform simple verifications of the 
-     * index.html that is included as part of the @Deployment
-     * 
-     * @author sbutton
-     */
-    @RunWith(Arquillian.class)
-    public class IndexPageTest {
+/**
+ * Test case to perform simple verifications of the 
+ * index.html that is included as part of the @Deployment
+ * 
+ * @author sbutton
+ */
+@RunWith(Arquillian.class)
+public class IndexPageTest {
 
-      private static final Logger LOG = Logger.getLogger(IndexPageTest.class.getName());
-      private static final int INDEX_PAGE_LINE_COUNT = 15;
-      private static final String INDEX_PAGE_TITLE = "wlsarq";
+  private static final Logger LOG = Logger.getLogger(IndexPageTest.class.getName());
+  private static final int INDEX_PAGE_LINE_COUNT = 15;
+  private static final String INDEX_PAGE_TITLE = "wlsarq";
 
-      @Deployment
-      public static WebArchive createDeployment() {
-        WebArchive war = ShrinkWrap.create(WebArchive.class)
-                .addAsWebResource("index.html");
-        return war;
-      }
+  @Deployment
+  public static WebArchive createDeployment() {
+    WebArchive war = ShrinkWrap.create(WebArchive.class)
+            .addAsWebResource("index.html");
+    return war;
+  }
 
-      @Test
-      @RunAsClient
-      public void test_index_page_present(@ArquillianResource URL testURL) {
+  @Test
+  @RunAsClient
+  public void test_index_page_present(@ArquillianResource URL testURL) {
 
-        LOG.info("Testing deployment @ " + testURL);
-        WebClient webClient = null;
-        
-        try {
-            webClient = new WebClient();
-            HtmlPage page = webClient.getPage(testURL);
-            Assert.assertTrue("Line count doesn't match", INDEX_PAGE_LINE_COUNT == page.getEndLineNumber());
-        } catch (Exception e) {
-            // Swallow me whole
-        } finally {
-            webClient.closeAllWindows();
-        }
-      }
-
-      @Test
-      @RunAsClient
-      public void test_index_title(@ArquillianResource URL testURL) {
-
-        LOG.info("Testing deployment @ " + testURL);
-        WebClient webClient = null;
-
-        try {
-            webClient = new WebClient();
-            final HtmlPage page = webClient.getPage(testURL);
-            Assert.assertEquals(INDEX_PAGE_TITLE, page.getTitleText());
-        } catch (Exception e) {
-            // Swallowed, doh!
-        } finally {
-            webClient.closeAllWindows();
-        }
-      }
+    LOG.info("Testing deployment @ " + testURL);
+    WebClient webClient = null;
+    
+    try {
+        webClient = new WebClient();
+        HtmlPage page = webClient.getPage(testURL);
+        Assert.assertTrue("Line count doesn't match", INDEX_PAGE_LINE_COUNT == page.getEndLineNumber());
+    } catch (Exception e) {
+        // Swallow me whole
+    } finally {
+        webClient.closeAllWindows();
     }
+  }
 
+  @Test
+  @RunAsClient
+  public void test_index_title(@ArquillianResource URL testURL) {
+
+    LOG.info("Testing deployment @ " + testURL);
+    WebClient webClient = null;
+
+    try {
+        webClient = new WebClient();
+        final HtmlPage page = webClient.getPage(testURL);
+        Assert.assertEquals(INDEX_PAGE_TITLE, page.getTitleText());
+    } catch (Exception e) {
+        // Swallowed, doh!
+    } finally {
+        webClient.closeAllWindows();
+    }
+  }
+}
+```
 
 In the test case a feature of Arquillian is being used that injects a reference to the URL of the deployed application that the test case can use to access the web application content within the archive.  This is really helpful since the archive is dynamically constructed with a generated module name and theregore has a potentially different context-root on each execution.  The ``@ArquillianResource`` annotation directs Arquillian to inject the URL for the deployed application for the unit tests to access and test web applications.
 
 Alternatively, you can can create a container specific deployment descriptor in which the context-root is specifed, such as weblogic.xml, and include that in the deployment archive that is created.
 
-    <weblogic-web-app>
-      <context-root>/wlsarq</context-root>
-    </weblogic-web-app>    
+```xml
+<weblogic-web-app>
+  <context-root>/wlsarq</context-root>
+</weblogic-web-app>
+```
 
 A second unit test is used to execute a test of a simple @Stateless EJB component using Arquillian.  This unit test creates a JavaArchive for deployment; uses @Inject to inject an instance of the EJB and then verifies it's behavior.
 
-    package buttso.demo.weblogic.wlsarq;
+```java
+package buttso.demo.weblogic.wlsarq;
 
-    import com.bea.core.repackaged.springframework.util.Assert;
-    import javax.inject.Inject;
-    import org.jboss.arquillian.container.test.api.Deployment;
-    import org.jboss.arquillian.junit.Arquillian;
-    import org.jboss.shrinkwrap.api.ShrinkWrap;
-    import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-    import org.jboss.shrinkwrap.api.spec.JavaArchive;
-    import org.junit.Test;
-    import org.junit.runner.RunWith;
+import com.bea.core.repackaged.springframework.util.Assert;
+import javax.inject.Inject;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-    /**
-     *
-     * Simple test case to verify behavior of EJB component
-     * Uses @Inject to inject bean to test
-     * 
-     */
-    @RunWith(Arquillian.class)
-    public class PingPongBeanTest {
+/**
+ *
+ * Simple test case to verify behavior of EJB component
+ * Uses @Inject to inject bean to test
+ * 
+ */
+@RunWith(Arquillian.class)
+public class PingPongBeanTest {
 
-      @Inject
-      PingPongBean ppb;
-       
-      @Deployment
-      public static JavaArchive createDeployment() {
-        JavaArchive jar = ShrinkWrap.create(JavaArchive.class)
-                .addClass(PingPongBean.class)
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-        return jar;
-      }
+  @Inject
+  PingPongBean ppb;
+   
+  @Deployment
+  public static JavaArchive createDeployment() {
+    JavaArchive jar = ShrinkWrap.create(JavaArchive.class)
+            .addClass(PingPongBean.class)
+            .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+    return jar;
+  }
 
-      @Test
-      public void test_ping_pong_bean() {
-        Assert.notNull(ppb, "PingPongBean was not injected, is null");
-        Assert.isTrue("pong".equals(ppb.ping()), "The ping didn't pong");
-      }
-    }
-
+  @Test
+  public void test_ping_pong_bean() {
+    Assert.notNull(ppb, "PingPongBean was not injected, is null");
+    Assert.isTrue("pong".equals(ppb.ping()), "The ping didn't pong");
+  }
+}
+```
 
 ## Executing the Unit Test
 
