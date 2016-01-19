@@ -47,6 +47,7 @@ public class IndexPageTest {
             Assert.assertTrue("Line count doesn't match", INDEX_PAGE_LINE_COUNT == page.getEndLineNumber());
         } catch (Exception e) {
             // Swallow me whole
+            throw new RuntimeException(e);
         } finally {
             webClient.closeAllWindows();
         }
@@ -66,6 +67,7 @@ public class IndexPageTest {
             Assert.assertEquals(INDEX_PAGE_TITLE, page.getTitleText());
         } catch (Exception e) {
             // Swallowed, doh!
+            throw new RuntimeException(e);
         } finally {
             webClient.closeAllWindows();
         }
