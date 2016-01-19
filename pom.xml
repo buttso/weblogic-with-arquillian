@@ -28,7 +28,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <wls.server>https://127.0.0.1:9001</wls.server>
+                <wls.server>http://127.0.0.1:9001</wls.server>
                 <wls.user>weblogic</wls.user>
                 <wls.pass>Welcome1#</wls.pass>
                 <wls.target>demojcs__adminserver</wls.target>
