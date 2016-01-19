@@ -11,7 +11,7 @@
             <property name="adminUrl">${wls.server}</property>
             <property name="adminUserName">${wls.user}</property>
             <property name="adminPassword">${wls.pass}</property>
-            <property name="target">AdminServer</property>
+            <property name="target">${wls.target}</property>
         </configuration>
     </container>
 </arquillian>

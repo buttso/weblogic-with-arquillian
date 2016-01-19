@@ -12,6 +12,7 @@
         <wls.server>http://127.0.0.1:7001</wls.server>
         <wls.user>weblogic</wls.user>
         <wls.pass>welcome1</wls.pass>
+        <wls.target>AdminServer</wls.target>
     </properties>  
  
     <profiles>
@@ -30,6 +31,7 @@
                 <wls.server>https://127.0.0.1:9001</wls.server>
                 <wls.user>weblogic</wls.user>
                 <wls.pass>Welcome1#</wls.pass>
+                <wls.target>demojcs__adminserver</wls.target>
             </properties>
         </profile>
     </profiles>
@@ -129,10 +131,11 @@
                     <systemPropertyVariables>
                         <wls.server>${wls.server}</wls.server>
                         <wls.user>${wls.user}</wls.user>
-                        <wls.pass>${wls.pass}</wls.pass>    
+                        <wls.pass>${wls.pass}</wls.pass>
+                        <wls.target>${wls.target}</wls.target>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>      
+            </plugin>
         </plugins>
     </build>
 </project>
